@@ -21,7 +21,7 @@ class GUI:
                                             disabled=False,
                                             button_style='', # 'success', 'info', 'warning', 'danger' or ''
                                             tooltip='Print graph and exports it ',
-                                            layout=Layout(height='auto', width='60%'),
+                                            layout=Layout(height='auto', width='auto'),
                                             icon='check' # (FontAwesome names without the `fa-` prefix)
                                             )
         
