@@ -301,7 +301,7 @@ class Dialog:
 
         self.create_intent(info['intent'], text_encoding)
         if info['intent'] not in self.intent_processors:
-            print("Intent not implemented")
+            print("Sorry, I can't do that")
         else:
             self.intent_processors[info['intent']](info['slots'], self.graph, text_encoding, self.user_id, start_dialog=self.start_dialog)
         self.last_node = text_encoding
