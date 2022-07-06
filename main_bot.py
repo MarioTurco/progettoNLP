@@ -326,7 +326,7 @@ class BooksIntentProcessor:
     
     # Se rating e best_value sono validi, allora si controlla se rating <= best_value. Se il best_value non é valido, allora si aggiunge solo il rating
     def add_rating_to_book(self, slots, rating_slots, graph, user, utterance_node_id):
-        print(rating_slots)
+        #print(rating_slots)
         book_dict = {}
         for prop in self.book_slot_names:
             if prop in slots:
@@ -348,7 +348,7 @@ class BooksIntentProcessor:
                 graph.add_edge(user, rating_slots['object_name'], label='RATES', rating=val)
                 print("Rating added for ", rating_slots['object_name'])
         else:
-            print('Valore rating non valido')
+            print('Invalid rating value ')
         graph.add_edge(utterance_node_id, rating_slots['object_name'], label='REFERS_TO')
   
     def create_book_rating_references(self, slots, graph, utterance_node_id, user_id, **kwargs):
@@ -385,7 +385,7 @@ class BooksIntentProcessor:
             print('No book found, please rephrase specifying a book')
         else:
             rating_slots['object_name'] = last_book
-            print("Libro trovato: " + last_book)
+            #print("Book found: " + last_book)
             self.add_rating_to_book(slots, rating_slots, graph, user, utterance_node_id)
         
              
@@ -440,7 +440,7 @@ class RestaurantIntentProcessor:
         if last_size == -1:
             print('No party size or description previously mentioned')
         else:
-            print("Party size found: ", last_size)
+            #print("Party size found: ", last_size)
             restaurant_slots[size_type] = last_size
             #add_party_size_to_graph(graph, restaurant_slots, utterance_node_id)
 
@@ -460,7 +460,7 @@ class RestaurantIntentProcessor:
         if last_loc == -1:
             print('No city or country or state or point of interest previously mentioned')
         else:
-            print("Location found: ", last_loc)
+            #print("Location found: ", last_loc)
             restaurant_slots[loc_type] = last_loc
             #add_restaurant_location_to_graph(graph, restaurant_slots, utterance_node_id)
 
@@ -470,7 +470,7 @@ class RestaurantIntentProcessor:
             return
             print('No time or day previously mentioned')
         else:
-            print("Time/day found: ", last_time)
+            #print("Time/day found: ", last_time)
             restaurant_slots['timeRange'] = last_time
             #add_restaurant_timeRange_to_graph(graph, restaurant_slots, utterance_node_id)
 
@@ -740,8 +740,8 @@ class WeatherIntentProcessor:
         # il primo libro di tipo object_tipe (se specificato, altrimenti il primo libro di qualsiasi tipo)
         last_loc, loc_type = self.find_last_location(utterance_node_id, graph)
         if last_loc == -1:
-            print('Missing location, rephrase considering a place') #TODO mettere nella gui
+            print('Missing location, please specify a place') #TODO mettere nella gui
         else:
-            print("Location found: " + last_loc)
+            #print("Location found: " + last_loc)
             weather_slots[loc_type] = last_loc
             self.add_weather(weather_slots, graph, utterance_node_id, start_dialog)
