@@ -51,20 +51,22 @@ class GUI:
         self.processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h-lv60-self")
         self.model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h-lv60-self")
         self.out = widgets.Output(layout={'border': '1px solid black', 'width' : '90%'})
+
         self.record_button = widgets.Button(description='Record',
                                             disabled=False,
                                             button_style='', # 'success', 'info', 'warning', 'danger' or ''
                                             tooltip='Click me',
                                             layout=Layout(height='auto', width='60%'),
-                                            icon='check' # (FontAwesome names without the `fa-` prefix)
+                                            icon='microphone-lines' # (FontAwesome names without the `fa-` prefix)
                                             )
-        self.transcription_text = widgets.Text( value='',
+
+        self.transcription_text = widgets.Text(value='',
                                                 placeholder='Transcription here',
                                                 description='Transcription:',
                                                 style = {'description_width':'initial'},
                                                 layout=Layout(height='auto',  width='90%',margin='4px', padding_right="20px"),
-                                                disabled=False
-                                            )
+                                                icon='pen-field',
+                                                disabled=False)
 
         self.send_button = widgets.Button(
             description='Send',
