@@ -24,6 +24,15 @@ class GUI:
                                             layout=Layout(height='auto', width='auto'),
                                             icon='check' # (FontAwesome names without the `fa-` prefix)
                                             )
+        self.box =  TwoByTwoLayout(top_left=self.save_button,
+                    bottom_left=None,
+                    bottom_right=None,
+                    top_right=None,
+                    justify_items='center',
+                    width="80%",
+                    align_items='center',
+                    align_content='center'
+                    )
         
         self.slider = widgets.IntSlider(
                                         value=5,
@@ -183,9 +192,4 @@ class GUI:
         self.save_button.on_click(self.export_graph)
         display(self.slider)
         display(self.app)
-        box_layout = widgets.Layout(display='flex',
-                flex_flow='column',
-                align_items='center',
-                width='50%')
-        box = widgets.HBox(children=[self.save_button],layout=box_layout)
-        display(box)
+        display(self.box)
