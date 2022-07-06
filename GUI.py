@@ -56,13 +56,14 @@ class GUI:
                                             button_style='', # 'success', 'info', 'warning', 'danger' or ''
                                             tooltip='Click me',
                                             layout=Layout(height='auto', width='60%'),
-                                            icon='check' # (FontAwesome names without the `fa-` prefix)
+                                            icon='' # (FontAwesome names without the `fa-` prefix)
                                             )
         self.transcription_text = widgets.Text( value='',
                                                 placeholder='Transcription here',
                                                 description='Transcription:',
                                                 style = {'description_width':'initial'},
                                                 layout=Layout(height='auto',  width='90%',margin='4px', padding_right="20px"),
+                                                icon=''
                                                 disabled=False
                                             )
 

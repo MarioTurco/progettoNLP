@@ -353,22 +353,6 @@ class RestaurantIntentProcessor:
         self.restaurant_essential = {'resturant_loc' : ['country', 'state', 'city'], 'restaurant_poi': ['spatial_relation', 'poi'], 'timeRange': ['timeRange'], 'restaurant_party' : ['party_size_number','party_size_description']}
         self.now_equivalents = ['now', 'today']
     
-    def print_reservation_message(self, restaurant_slots):
-        slots = ['city', 'state', 'country']
-        party_size = ""
-        loc = ""
-        for slot in slots:
-            if restaurant_slots[slot]:
-                loc+ restaurant_slots[slot] + " "
-        if restaurant_slots['poi'] and restaurant_slots['spatial_relation']:
-                loc+restaurant_slots['spatial_relation']+" "+restaurant_slots['poi']
-        if restaurant_slots['party_size_number']:
-            party_size = restaurant_slots['party_size_number']
-        else:
-             party_size = restaurant_slots['party_size_description']
-        
-        print("Reserved for ", party_size, ", time: ", restaurant_slots['timeRange'], " in ", loc)
-
     def create_restaurant_references(self, slots, graph, utterance_node_id, user_id, start_dialog):
         restaurant_find_last = {1:self.restaurant_last_loc, 3:self.restaurant_last_timeRange, 2:self.restaurant_last_party_size}
         # Costruisco un dizionario con tutti i possibili slot, in modo tale da controllare facilmente se gli slot sono riempiti
@@ -546,6 +530,25 @@ class RestaurantIntentProcessor:
             graph.add_edge(utterance_node_id, global_node_id, label="REFERS_TO")
             global_node_id += 1
         return ret
+
+    def print_reservation_message(self, restaurant_slots):
+        slots = ['city', 'state', 'country']
+        party_size = ""
+        loc = ""
+        for slot in slots:
+            if restaurant_slots[slot] is not None:
+                loc = loc + str(restaurant_slots[slot]) + " "
+        if restaurant_slots['poi'] is not None and restaurant_slots['spatial_relation'] is not None:
+                loc = loc + restaurant_slots['spatial_relation']+" "+restaurant_slots['poi']
+        if restaurant_slots['party_size_number'] is not None:
+            party_size = restaurant_slots['party_size_number']
+        else:
+             party_size = restaurant_slots['party_size_description']
+        if restaurant_slots['timeRange'] is None:
+            time = "now"
+        else: 
+            time = restaurant_slots['timeRange']
+        print("Reserved for ", party_size, ", time: ",time, " in ", loc)
 
     def add_restaurant(self, restaurant_slots, graph, utterance_node_id, start_dialog):
         ret_string = "Insert "
