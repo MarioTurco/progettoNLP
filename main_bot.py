@@ -132,7 +132,15 @@ class DatasetPreprocessor:
 class MetricsCalculator:
     def __init__(self):
         MetricsCalculator.intentMetric = staticmethod(MetricsCalculator.intentMetric)
-        
+    
+    def accuracy_metrics(y_true, x_test, model, tokenizer):
+        m.reset_state()
+        m = SparseCategoricalAccuracy("accuracy")
+        m.update_state(encoded_intents, joint_model(x)[1])
+        print("Acc intents: " + str(m.result().numpy()))
+        m.reset_state()
+        m.update_state(encoded_slots, joint_model(x)[0])
+        print("Acc slots: " + str(m.result().numpy()))
     #returns accuracy, precision, recall, fscore
     def intentMetrics(y_true, x_test, dialog):
         y_pred = []
