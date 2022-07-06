@@ -29,7 +29,7 @@ class GUI:
                     bottom_right=None,
                     top_right=None,
                     justify_items='center',
-                    width="80%",
+                    width="100%",
                     align_items='center',
                     align_content='center'
                     )
