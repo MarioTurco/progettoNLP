@@ -4,15 +4,12 @@ from number_parser import parse_number
 import tensorflow as tf
 from collections import OrderedDict
 import numpy as np
-from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
 import warnings
 from transformers import TFBertModel
 from tensorflow.keras.layers import Dropout, Dense, GlobalAveragePooling1D
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
-from tensorflow.keras.callbacks import ModelCheckpoint
+from sklearn.preprocessing import MultiLabelBinarizer
 
 warnings.filterwarnings('ignore')
 warnings.simplefilter('ignore')
@@ -23,7 +20,7 @@ global_node_id = 2
 class JointIntentAndSlotFillingModel(tf.keras.Model):
 
     def __init__(self, intent_num_labels=None, slot_num_labels=None,
-                 model_name=model_name, dropout_prob=0.1):
+                 model_name="model", dropout_prob=0.1):
         super().__init__(name="joint_intent_slot")
         self.bert = TFBertModel.from_pretrained(model_name)
         self.dropout = Dropout(dropout_prob)
@@ -172,29 +169,25 @@ class DatasetPreprocessor:
 
 class MetricsCalculator:
     def __init__(self):
-        MetricsCalculator.intentMetric = staticmethod(MetricsCalculator.intentMetric)
-    
-    def accuracy_metrics(y_true, x_test, model, tokenizer):
-        m.reset_state()
+        MetricsCalculator.accuracy_metrics = staticmethod(MetricsCalculator.accuracy_metrics)
+        MetricsCalculator.precision_recall_fscore_metrics = staticmethod(MetricsCalculator.precision_recall_fscore_metrics)
+
+    def accuracy_metrics(intents_true, slots_true, x_test, model):
         m = SparseCategoricalAccuracy("accuracy")
-        m.update_state(encoded_intents, joint_model(x)[1])
+        m.reset_state()
+        m.update_state(intents_true, model(x_test)[1])
         print("Acc intents: " + str(m.result().numpy()))
         m.reset_state()
-        m.update_state(encoded_slots, joint_model(x)[0])
+        m.update_state(slots_true, model(x_test)[0])
         print("Acc slots: " + str(m.result().numpy()))
-    #returns accuracy, precision, recall, fscore
-    def intentMetrics(y_true, x_test, dialog):
-        y_pred = []
-        for sample in x_test:
-            y_pred_intent_sample = dialog.nlu(sample, dialog.tokenizer, dialog.joint_model)
-            y_pred_intent_sample = y_pred_intent_sample["intent"]
-            y_pred.append(y_pred_intent_sample)
 
-        y_pred = np.array(y_pred)
-        y_true = np.array(y_true)
-        precision, recall, fscore, _ = precision_recall_fscore_support(y_true, y_pred, average='micro')
-        return accuracy_score(y_true, y_pred), precision, recall, fscore
-    
+    #returns accuracy, precision, recall, fscore
+    def precision_recall_fscore_metrics(intents_true, slots_true, x_test, model):
+        intent_id = model(x_test)[1].numpy().argmax(axis=-1)
+        print("Precision Recall F1 intents: " + str(precision_recall_fscore_support(intents_true, intent_id, average='macro')[:3]))
+        m = MultiLabelBinarizer().fit(slots_true)
+        slots_id = model(x_test)[0].numpy().argmax(axis=-1)
+        print("Precision Recall F1 slots: " + str(precision_recall_fscore_support(m.transform(slots_true), m.transform(slots_id), average='macro')[:3]))
     
 
 class Dialog:
