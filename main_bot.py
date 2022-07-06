@@ -368,9 +368,6 @@ class BooksIntentProcessor:
         return self.find_last_book(next_node, graph, object_type)    
 
     def rate_last_book(self, graph, utterance_node_id, slots, rating_slots, user): #Se object_type=None prende semplicemente l'ultimo libro presente nel dialogo
-        # Vedere sulla doc di networkx come navigare gli archi del grafo
-        # Fondamentalmente va fatta una visita a ritroso a partire dalla utterance attuale fino a trovare
-        # il primo libro di tipo object_tipe (se specificato, altrimenti il primo libro di qualsiasi tipo)
         last_book = self.find_last_book(utterance_node_id, graph, rating_slots['object_type'])
         if last_book == -1:
             print('No book found, please rephrase specifying a book')
