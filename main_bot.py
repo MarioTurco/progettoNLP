@@ -7,11 +7,48 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
 import warnings
+from transformers import TFBertModel
+from tensorflow.keras.layers import Dropout, Dense, GlobalAveragePooling1D
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.metrics import SparseCategoricalAccuracy
+from tensorflow.keras.callbacks import ModelCheckpoint
+
 warnings.filterwarnings('ignore')
 warnings.simplefilter('ignore')
 
 global_node_id = 2
 
+
+class JointIntentAndSlotFillingModel(tf.keras.Model):
+
+    def __init__(self, intent_num_labels=None, slot_num_labels=None,
+                 model_name=model_name, dropout_prob=0.1):
+        super().__init__(name="joint_intent_slot")
+        self.bert = TFBertModel.from_pretrained(model_name)
+        self.dropout = Dropout(dropout_prob)
+        self.intent_classifier = Dense(intent_num_labels,
+                                       name="intent_classifier")
+        self.slot_classifier = Dense(slot_num_labels,
+                                     name="slot_classifier")
+
+    def call(self, inputs, **kwargs):
+        # two outputs from BERT
+        trained_bert = self.bert(inputs, **kwargs)
+        pooled_output = trained_bert.pooler_output
+        sequence_output = trained_bert.last_hidden_state
+        
+        # sequence_output will be used for slot_filling / classification
+        sequence_output = self.dropout(sequence_output,
+                                       training=kwargs.get("training", False))
+        slot_logits = self.slot_classifier(sequence_output)
+
+        # pooled_output for intent classification
+        pooled_output = self.dropout(pooled_output,
+                                     training=kwargs.get("training", False))
+        intent_logits = self.intent_classifier(pooled_output)
+
+        return slot_logits, intent_logits
 
 class DatasetPreprocessor:
     def encode_slots(self, all_slots, all_texts, 
@@ -136,7 +173,15 @@ class DatasetPreprocessor:
 class MetricsCalculator:
     def __init__(self):
         MetricsCalculator.intentMetric = staticmethod(MetricsCalculator.intentMetric)
-        
+    
+    def accuracy_metrics(y_true, x_test, model, tokenizer):
+        m.reset_state()
+        m = SparseCategoricalAccuracy("accuracy")
+        m.update_state(encoded_intents, joint_model(x)[1])
+        print("Acc intents: " + str(m.result().numpy()))
+        m.reset_state()
+        m.update_state(encoded_slots, joint_model(x)[0])
+        print("Acc slots: " + str(m.result().numpy()))
     #returns accuracy, precision, recall, fscore
     def intentMetrics(y_true, x_test, dialog):
         y_pred = []
