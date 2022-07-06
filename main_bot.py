@@ -6,6 +6,10 @@ from collections import OrderedDict
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
+import warnings
+warnings.filterwarnings('ignore')
+warnings.simplefilter('ignore')
+
 global_node_id = 2
 
 
@@ -300,12 +304,12 @@ class BooksIntentProcessor:
                 best_val = parse_number(rating_slots['best_rating'].split(' ')[0])
                 if val <= best_val:
                     graph.add_edge(user, rating_slots['object_name'], label='RATES', rating=val, best_value=best_val)
-                    print("Rating added")
+                    print("Rating added for ", rating_slots['object_name'])
                 else:
                     print("You cannot rate a book more than the best rating")
             else:
                 graph.add_edge(user, rating_slots['object_name'], label='RATES', rating=val)
-                print("Rating added")
+                print("Rating added for ", rating_slots['object_name'])
         else:
             print('Valore rating non valido')
         graph.add_edge(utterance_node_id, rating_slots['object_name'], label='REFERS_TO')
@@ -357,7 +361,7 @@ class RestaurantIntentProcessor:
         self.restaurant_essential = {'resturant_loc' : ['country', 'state', 'city'], 'restaurant_poi': ['spatial_relation', 'poi'], 'timeRange': ['timeRange'], 'restaurant_party' : ['party_size_number','party_size_description']}
         self.now_equivalents = ['now', 'today']
     
-    def print_reservation_message(restaurant_slots):
+    def print_reservation_message(self, restaurant_slots):
         slots = ['city', 'state', 'country']
         party_size = ""
         loc = ""
