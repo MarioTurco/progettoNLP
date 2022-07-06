@@ -319,15 +319,12 @@ class BooksIntentProcessor:
     
     # Se rating e best_value sono validi, allora si controlla se rating <= best_value. Se il best_value non é valido, allora si aggiunge solo il rating
     def add_rating_to_book(self, slots, rating_slots, graph, user, utterance_node_id):
-        print(rating_slots)
         book_dict = {}
         for prop in self.book_slot_names:
             if prop in slots:
                 book_dict[prop] = slots[prop]
 
         graph.add_node(rating_slots['object_name'], labels=":Book", **book_dict)
-        best_value = None
-        rating = None
         val = parse_number(rating_slots['rating_value'].split(' ')[0])
         if rating_slots['rating_value'] and val > 0:
             if rating_slots['best_rating'] and val > 0:
