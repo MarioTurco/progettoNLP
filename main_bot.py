@@ -6,6 +6,10 @@ from collections import OrderedDict
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
+import warnings
+warnings.filterwarnings('ignore')
+warnings.simplefilter('ignore')
+
 global_node_id = 2
 
 
