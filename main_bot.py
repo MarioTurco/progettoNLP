@@ -20,7 +20,7 @@ global_node_id = 2
 class JointIntentAndSlotFillingModel(tf.keras.Model):
 
     def __init__(self, intent_num_labels=None, slot_num_labels=None,
-                 model_name=model_name, dropout_prob=0.1):
+                 model_name="model", dropout_prob=0.1):
         super().__init__(name="joint_intent_slot")
         self.bert = TFBertModel.from_pretrained(model_name)
         self.dropout = Dropout(dropout_prob)
@@ -169,11 +169,12 @@ class DatasetPreprocessor:
 
 class MetricsCalculator:
     def __init__(self):
-        MetricsCalculator.intentMetric = staticmethod(MetricsCalculator.intentMetric)
-    
+        MetricsCalculator.accuracy_metrics = staticmethod(MetricsCalculator.accuracy_metrics)
+        MetricsCalculator.precision_recall_fscore_metrics = staticmethod(MetricsCalculator.precision_recall_fscore_metrics)
+
     def accuracy_metrics(intents_true, slots_true, x_test, model):
-        m.reset_state()
         m = SparseCategoricalAccuracy("accuracy")
+        m.reset_state()
         m.update_state(intents_true, model(x_test)[1])
         print("Acc intents: " + str(m.result().numpy()))
         m.reset_state()
