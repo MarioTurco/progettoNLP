@@ -293,6 +293,7 @@ class Dialog:
         self.graph.add_edge(text_encoding, self.last_node, label='FOLLOWS')
 
         self.create_intent(info['intent'], text_encoding)
+        #print(info['intent'])
         if info['intent'] not in self.intent_processors:
             print("Sorry, I can't do that")
         else:
@@ -331,6 +332,7 @@ class BooksIntentProcessor:
         else:
             val = parse_number(rating_slots['rating_value'].split(' ')[0])
         if rating_slots['rating_value'] and val >= 0:
+            #print(val, 'out of', rating_slots['best_rating'])
             if rating_slots['best_rating'] and val >= 0:
                 best_val = parse_number(rating_slots['best_rating'].split(' ')[0])
                 if val <= best_val:
