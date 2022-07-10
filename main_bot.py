@@ -326,9 +326,12 @@ class BooksIntentProcessor:
                 book_dict[prop] = slots[prop]
 
         graph.add_node(rating_slots['object_name'], labels=":Book", **book_dict)
-        val = parse_number(rating_slots['rating_value'].split(' ')[0])
-        if rating_slots['rating_value'] and val > 0:
-            if rating_slots['best_rating'] and val > 0:
+        if not rating_slots['rating_value']:
+            val = -1
+        else:
+            val = parse_number(rating_slots['rating_value'].split(' ')[0])
+        if rating_slots['rating_value'] and val >= 0:
+            if rating_slots['best_rating'] and val >= 0:
                 best_val = parse_number(rating_slots['best_rating'].split(' ')[0])
                 if val <= best_val:
                     graph.add_edge(user, rating_slots['object_name'], label='RATES', rating=val, best_value=best_val)
