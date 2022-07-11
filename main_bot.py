@@ -315,7 +315,7 @@ class Dialog:
     
     def create_intent_and_references(self, utterance, tokenizer):
         global global_node_id
-        info = self.nlu(utterance, tokenizer, self.joint_model)
+        info = self.nlu(utterance.lower(), tokenizer, self.joint_model)
         text_encoding = global_node_id
         self.graph.add_node(text_encoding, labels=":Utterance", text=utterance)
         global_node_id += 1
