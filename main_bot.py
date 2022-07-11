@@ -17,6 +17,39 @@ warnings.simplefilter('ignore')
 global_node_id = 2
 
 
+class JointIntentAndSlotFillingModel_v2(tf.keras.Model):
+
+    def __init__(self, intent_num_labels=None, slot_num_labels=None,
+                 model_name="model", dropout_prob=0.1):
+        super().__init__(name="joint_intent_slot")
+        self.bert = TFBertModel.from_pretrained(model_name)
+        self.dropout = Dropout(dropout_prob)
+        self.hidden_layer = Dense(128, activation="relu")
+        self.intent_classifier = Dense(intent_num_labels,
+                                       name="intent_classifier")
+        self.slot_classifier = Dense(slot_num_labels,
+                                     name="slot_classifier")
+
+    def call(self, inputs, **kwargs):
+        # two outputs from BERT
+        trained_bert = self.bert(inputs, **kwargs)
+        pooled_output = trained_bert.pooler_output
+        sequence_output = trained_bert.last_hidden_state
+
+        # sequence_output will be used for slot_filling / classification
+        sequence_output = self.dropout(sequence_output,
+                                       training=kwargs.get("training", False))
+        sequence_output = self.hidden_layer(sequence_output)
+        slot_logits = self.slot_classifier(sequence_output)
+
+        # pooled_output for intent classification
+        pooled_output = self.dropout(pooled_output,
+                                     training=kwargs.get("training", False))
+        pooled_output = self.hidden_layer(pooled_output)
+        intent_logits = self.intent_classifier(pooled_output)
+
+        return slot_logits, intent_logits
+
 class JointIntentAndSlotFillingModel(tf.keras.Model):
 
     def __init__(self, intent_num_labels=None, slot_num_labels=None,
